@@ -1,0 +1,35 @@
+upstream rate-api {
+	server host.docker.internal:9000;
+}
+
+server {
+		listen 80 default_server;
+
+		root /usr/share/nginx/html;
+		index index.html index.htm;
+
+		server_name test-whtapp.com;
+
+		location / {
+			default_type 'application/json';
+			content_by_lua_block {
+				ngx.say("ping:", "ok")
+			}
+		}
+
+		location /api/v1/rules {
+				content_by_lua_file /etc/nginx/rule.lua;
+				proxy_pass http://rate-api/api/v1/rules;
+				proxy_redirect off;
+				proxy_set_header Host $host:$server_port;
+				proxy_set_header X-Real-IP $remote_addr;
+				proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		}
+
+		location /lua_content {
+			default_type 'text/plain';
+			content_by_lua_file /etc/nginx/rule.lua;
+		}
+	
+
+}

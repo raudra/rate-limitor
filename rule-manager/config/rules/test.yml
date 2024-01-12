@@ -1,0 +1,8 @@
+---
+rules:
+  - name: IpRule
+    window: 300
+    count: 20
+  - name: IPPathRule
+    window: 600
+    count: 20
